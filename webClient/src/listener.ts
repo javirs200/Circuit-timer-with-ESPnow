@@ -4,8 +4,9 @@ export function setupListener() {
 
         // Get the elements from the DOM.
         const connector = document.querySelector<HTMLButtonElement>('#connector')!;
-        const disconnector = document.querySelector<HTMLButtonElement>('#disconnector')!;
-        const output = document.querySelector<HTMLTextAreaElement>('#output')!;
+        const timetable = document.querySelector<HTMLTextAreaElement>('#timetable')!;
+        const timeContainer = document.querySelector<HTMLHeadingElement>('#timeContainer')!;
+        const bestLapContainer = document.querySelector<HTMLHeadingElement>('#bestLap')!;
 
         // Prompt user to select any serial port.
         connector.addEventListener('click', async () => {
@@ -15,12 +16,11 @@ export function setupListener() {
             // Wait for the port to open. 115200 is the default baud rate for esp32.
             await port.open({ baudRate: 115200 });
 
-            // if serial port is open, hide the connect button and show the disconnect button
-            connector.hidden = true;
-            disconnector.hidden = false;
-
             // Setup a reader to read data from the serial port.
             const reader = port.readable.getReader();
+
+            let bestLap = 0;
+            let laps = 0;
 
             // Read data from the serial port.
             while (true) {
@@ -34,18 +34,39 @@ export function setupListener() {
                 const textDecoder = new TextDecoder();
                 const text = textDecoder.decode(value);
 
-                // Append the data to the textarea element.
-                output.value += text;
+                if (text.includes('time:')) {
+                    laps++;
+                    // trim the string to get the time
+                    const time = text.trim().split(' ')[1];
 
-                // Scroll to the bottom of the textarea element.
-                output.scrollTop = output.scrollHeight;
+                    //format the time from milliseconds to ss:mm.miliseconds
+                    const formatedtime = convertTimeToFormattedString(time);
+
+                    // display the time in the timeContainer
+                    timeContainer.textContent = formatedtime;
+
+                    // display the data in the output table
+                    const tr = document.createElement('tr');
+                    const lapnumber = document.createElement('td');
+                    const laptime = document.createElement('td');
+                    lapnumber.textContent = laps.toString();
+                    laptime.textContent = formatedtime;
+
+                    tr.appendChild(lapnumber);
+                    tr.appendChild(laptime);
+
+                    timetable.appendChild(tr);
+                                       
+                    // calculate the best lap
+                    if (bestLap === 0 || parseInt(time) < bestLap) {
+                        bestLap = parseInt(time);
+                        bestLapContainer.textContent = "best:" + convertTimeToFormattedString(time);
+                    }
+                }
 
                 // if the data contains the string "done", close the serial port
                 if (text.includes('done')) {
                     await port.close();
-                    // if serial port is closed, hide the disconnect button and show the connect button
-                    connector.hidden = false;
-                    disconnector.hidden = true;
                     break;
                 }
             }
@@ -57,5 +78,13 @@ export function setupListener() {
         // The Web Serial API is not supported.
         // Inform user.
         console.error('Web Serial API is not supported.');
+    }
+
+    function convertTimeToFormattedString(time: string) {
+        const timeInMilliseconds = parseInt(time);
+        const minutes = Math.floor(timeInMilliseconds / 60000);
+        const Milliseconds = ((timeInMilliseconds % 60000) / 1000).toFixed(3);
+        const formatedtime = minutes + ':' + (parseInt(Milliseconds) < 10 ? '0' : '') + Milliseconds;
+        return formatedtime;
     }
 }

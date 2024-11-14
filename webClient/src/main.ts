@@ -1,18 +1,20 @@
 import './style.css'
 import { setupListener } from './listener.ts'
 
+// ths is the entry point of the web application and insdide of main
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <h1>Serial port</h1>
-    <div class="card">
-    <p>COM Port Selector<p>
-    <button id="connector" type="button">connect</button>
-    <button id="disconnector" type="button" hidden>connect</button>
-    </div>
-    <div class="card">
-      <textarea id="output" rows="10" cols="50"></textarea>
-    </div>
-  </div>
+  <section>
+      <div class="bigCard">
+        <h1 class="time" id="timeContainer">
+      </div>
+  </section>
+  <section>
+  <button id="connector" type="button">connect</button>
+    <h2 id="bestLap"></h2>
+    <section class="card">
+      <h3>Timetable</h3>
+      <table id="timetable"></table>
+    </section>
+  </section>
 `
-
 setupListener()
