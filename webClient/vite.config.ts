@@ -6,6 +6,7 @@ export default {
     },
     //build
     build: {
-      outDir: '../docs'
+      outDir: '../docs',
+      assetsDir: './'
     }
   }
