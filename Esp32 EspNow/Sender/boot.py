@@ -34,6 +34,7 @@ while True:
     try:
         response = e.send(peer,"lap")
         flash(0.1)
+        # time to get distance from the receptor and don take to laps read
         sleep(1)
         pass
     except:
