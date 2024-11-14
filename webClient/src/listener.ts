@@ -6,8 +6,8 @@ export function setupListener(element: HTMLButtonElement) {
             // Prompt user to select any serial port.
             const port = await navigator.serial.requestPort();
 
-            // Wait for the port to open.
-            await port.open({ baudRate: 9600 });
+            // Wait for the port to open. 115200 is the default baud rate for esp32.
+            await port.open({ baudRate: 115200 });
 
             // Setup a reader to read data from the serial port.
             const reader = port.readable.getReader();
