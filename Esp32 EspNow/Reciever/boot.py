@@ -27,7 +27,7 @@ async def serialManager(dbTreshold):
             char = sys.stdin.read(1)
         else:
             char = None
-        
+            
         # build msg
         if char:
             msg = msg + char
@@ -36,10 +36,10 @@ async def serialManager(dbTreshold):
                 print("msg:",msg , "count:",count)
                 if count == 4:
                     newTreshold = int(msg)
-                    # print("newTreshold:",newTreshold)
+                    print("newTreshold:",newTreshold)
                     if newTreshold < 0 and newTreshold != dbTreshold[0]:
                         dbTreshold[0] = newTreshold
-                        # print("new dbTreshold:",dbTreshold[0])
+                        print("new dbTreshold:",dbTreshold[0])
                 count = 0
                 msg = ""    
                 
@@ -53,7 +53,7 @@ async def espnowManager(e,dbTreshold,currentLap):
             currentmsgData = e.peers_table[host]
             db = currentmsgData[0]
             timestamp = currentmsgData[1]
-            # print("db:",db,"dbTreshold:",dbTreshold[0])
+            #print("db:",db,"dbTreshold:",dbTreshold[0])
             if db > dbTreshold[0]:
                 if currentLap == 0:
                     print("initial lap")
