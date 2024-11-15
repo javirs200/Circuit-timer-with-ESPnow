@@ -9,6 +9,10 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
       </div>
   </section>
   <section>
+    <h1>Settings</h1>
+    <label id="inLablel" for="input">db :-50</label>
+    <input type="number" id="input" placeholder="enter setting">
+    <button id="send" type="button">Send</button>
   <button id="connector" type="button">connect</button>
     <h2 id="bestLap"></h2>
     <section class="card">
