@@ -11,11 +11,10 @@ led=Pin(2,Pin.OUT) # onboard led
 led.value(0)
 
 def flash(speed):
-    for i in range(3):
         led.value(1)
-        sleep(speed)
+        uasyncio.sleep(speed)
         led.value(0)
-        sleep(speed)
+        uasyncio.sleep(speed)
 
 async def serialManager(dbTreshold):
     count = 0
@@ -36,32 +35,31 @@ async def serialManager(dbTreshold):
                 print("msg:",msg , "count:",count)
                 if count == 4:
                     newTreshold = int(msg)
-                    print("newTreshold:",newTreshold)
                     if newTreshold < 0 and newTreshold != dbTreshold[0]:
                         dbTreshold[0] = newTreshold
                         print("new dbTreshold:",dbTreshold[0])
                 count = 0
-                msg = ""    
-                
-        await uasyncio.sleep(0.2)
+                msg = ""
+                                
+        await uasyncio.sleep(0.01)
 
 async def espnowManager(e,dbTreshold,currentLap):
+    diff = 0
     while True:
         host,msg = e.recv()
         if msg == b'lap':
-            flash(0.1)
             currentmsgData = e.peers_table[host]
             db = currentmsgData[0]
             timestamp = currentmsgData[1]
-            #print("db:",db,"dbTreshold:",dbTreshold[0])
             if db > dbTreshold[0]:
-                if currentLap == 0:
-                    print("initial lap")
-                elif timestamp - currentLap > 1000:
-                    print("time:", timestamp - currentLap)
-                    flash(0.2)
+                diff = timestamp - currentLap
+                if diff > 2000:
+                    flash(0.01)
+                    print("time:", diff)
                 currentLap = timestamp
-        await uasyncio.sleep(0.2)
+            #debug print it is sended to serial port , remove beroe production
+            #print("db:",db,"timestamp:",timestamp,"currentLap:",currentLap,"diff:",diff)
+        await uasyncio.sleep(0.01)
 
 def main():
     # A WLAN interface must be active to send()/recv()
@@ -73,7 +71,7 @@ def main():
     e.active(True)
 
     currentLap = 0
-    dbTreshold = [-50]
+    dbTreshold = [-20]
 
     try:
         loop = uasyncio.get_event_loop()
